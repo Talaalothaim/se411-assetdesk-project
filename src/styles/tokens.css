@@ -1,0 +1,37 @@
+/* Design tokens – copied from the approved mockup (light + dark) */
+:root {
+  --bg: #F3F4F1; --surface: #FFFFFF; --surface-2: #F8F8F5; --line: #E2E4DE; --line-2: #ECEDE8;
+  --fg: #15171C; --muted: #5B616E; --body: #3E434D;
+  --side: #15171C; --side-fg: #C4C8D0; --side-hover: #22252D; --side-on: #2C303A; --side-card: #1E2128; --side-muted: #A3A8B2;
+  --accent: #2B4BD8; --on-accent: #FFFFFF; --track: #ECEDE8;
+  --ok-bg: #E2F2E7; --ok: #17663A; --as-bg: #E6EBFB; --as: #2A3FA8; --rp-bg: #FCEADB; --rp: #94440A;
+  --danger: #B42318; --danger-bg: #FFF7F6; --scrim: rgba(21, 23, 28, .45);
+
+  --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+
+  --bar-h: 60px; --side-w: 248px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101216; --surface: #181B21; --surface-2: #1D2027; --line: #2A2E37; --line-2: #252930;
+    --fg: #ECEDF0; --muted: #9AA0AC; --body: #C2C6CE;
+    --side: #0B0C0F; --side-hover: #1A1D23; --side-on: #242832; --side-card: #16181D;
+    --accent: #6E86F0; --on-accent: #0B0C0F; --track: #262A32;
+    --ok-bg: #16301F; --ok: #7BD19A; --as-bg: #1C2440; --as: #9DB0F5; --rp-bg: #3A2412; --rp: #F2A866;
+    --danger: #F08A80; --danger-bg: #2A1715;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #101216; --surface: #181B21; --surface-2: #1D2027; --line: #2A2E37; --line-2: #252930;
+  --fg: #ECEDF0; --muted: #9AA0AC; --body: #C2C6CE;
+  --side: #0B0C0F; --side-hover: #1A1D23; --side-on: #242832; --side-card: #16181D;
+  --accent: #6E86F0; --on-accent: #0B0C0F; --track: #262A32;
+  --ok-bg: #16301F; --ok: #7BD19A; --as-bg: #1C2440; --as: #9DB0F5; --rp-bg: #3A2412; --rp: #F2A866;
+  --danger: #F08A80; --danger-bg: #2A1715;
+  color-scheme: dark;
+}
