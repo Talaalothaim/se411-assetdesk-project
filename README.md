@@ -115,4 +115,4 @@ SE411 – Course Project · Prince Sultan University
 
 ## Note on AI use
 
-The frontend was generated with an AI tool, Claude Code, from the team's written build prompt and an approved HTML mockup. The team reviewed and tested the result. The Part 2 Spring Boot API will be written by hand.
+The frontend was generated with an AI tool from the team's written build prompt. The team reviewed and tested the result. The Part 2 Spring Boot API will be written by hand.
