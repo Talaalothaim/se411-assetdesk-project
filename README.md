@@ -74,17 +74,35 @@ docs/
 
 ## Screenshots
 
-_Screenshots will be added here._
+<details open>
+<summary><b>Dashboard</b></summary>
+<br>
+<img src="docs/screenshots/dashboard.png" alt="Dashboard with asset counts, assets by type and needs attention list" width="900">
+</details>
 
-| Screen | Image |
-|---|---|
-| Dashboard | _todo_ |
-| Assets list with filters | _todo_ |
-| Asset details | _todo_ |
-| Add / Edit form | _todo_ |
-| Phone menu | _todo_ |
-| About | _todo_ |
+<details>
+<summary><b>Assets – Find by ID and filters</b></summary>
+<br>
+<img src="docs/screenshots/assets-filters.png" alt="Assets page with Find by ID box and Filter by card" width="900">
+</details>
 
+<details>
+<summary><b>Assets – table and pagination</b></summary>
+<br>
+<img src="docs/screenshots/assets-table.png" alt="Assets table showing 10 rows per page with pagination" width="900">
+</details>
+
+<details>
+<summary><b>Add asset</b></summary>
+<br>
+<img src="docs/screenshots/add-asset-form.png" alt="Add a new asset form" width="900">
+</details>
+
+<details>
+<summary><b>About the team</b></summary>
+<br>
+<img src="docs/screenshots/about.png" alt="About page with team members and student IDs" width="900">
+</details>
 ## Team
 
 | # | Name | Student ID |
