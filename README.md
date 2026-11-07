@@ -11,44 +11,42 @@ SE411 Course Project | Prince Sultan University
 
 ## Project Overview
 
-AssetDesk is a full-stack IT asset management application developed using React and Java Spring Boot. It allows organizations to manage laptops, monitors, desktops, and accessories.
+AssetDesk is a full-stack IT asset management system developed using React and Java Spring Boot. It allows organizations to manage laptops, monitors, desktops, and accessories.
 
-The project consists of:
+The project consists of two parts:
 
-- Part 1: React frontend with an in-memory data service.
-- Part 2: Spring Boot REST API, H2 database, automated backend tests, and frontend-backend integration.
+- Part 1: React frontend and an in-memory data service.
+- Part 2: Spring Boot REST API, H2 database, automated backend testing, and frontend-backend integration.
 
 ## Technologies Used
 
 ### Frontend
+
 - React 18
 - JavaScript
 - Vite
 - React Router
 - CSS
-- Vitest
-- React Testing Library
+- Vitest and React Testing Library
 
 ### Backend
+
 - Java 21
 - Spring Boot 3.5.7
 - Spring Web
 - Spring Data JDBC
 - H2 Database
 - Maven
-- JUnit 5
-- Mockito
+- JUnit 5 and Mockito
 
 ## Features
 
 - Dashboard with inventory statistics
-- Add new assets
+- Add, view, update, and delete IT assets
 - Find assets by ID
-- View assets with pagination
-- Update asset details
-- Delete assets
-- Filter by type, condition, and status
+- Paginated asset listing
 - Search by device name, serial number, or employee
+- Filter by asset type, condition, and status
 - Form validation and duplicate serial detection
 - HTTP error handling
 - Responsive user interface
@@ -69,66 +67,63 @@ The project consists of:
     ├── public/
     ├── docs/
     ├── package.json
+    ├── package-lock.json
     ├── vite.config.js
     └── README.md
 
 ## Running the Backend
 
 Requirements:
+
 - Java 21
 - Maven or Eclipse with Maven support
 
-Open the backend folder in Eclipse as an existing Maven project and run the Spring Boot application.
+Open the `backend` folder in Eclipse as an existing Maven project and run the Spring Boot application.
 
 Alternatively, from the backend directory:
 
     mvn spring-boot:run
 
-The backend runs at:
+The server runs at:
 
 http://localhost:8080
-
-The API base URL is:
-
-http://localhost:8080/api/assets
-
-The H2 database contains 12 sample assets when the application starts.
 
 ## Running the Frontend
 
 Requirements:
+
 - Node.js compatible with Vite 8
 - npm
 
-From the repository root, run:
+From the repository root:
 
     npm install
     npm run dev
 
-Open:
+Open the application at:
 
 http://localhost:5173
 
-The Spring Boot backend must be running for asset operations to work.
+The Spring Boot backend must also be running.
 
 ## REST API Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | /api/assets | View assets with pagination and filters |
+| GET | /api/assets | Retrieve assets with pagination and filtering |
 | GET | /api/assets/{id} | Find an asset by ID |
-| POST | /api/assets | Add an asset |
-| PUT | /api/assets/{id} | Update an asset |
+| POST | /api/assets | Add a new asset |
+| PUT | /api/assets/{id} | Update an existing asset |
 | DELETE | /api/assets/{id} | Delete an asset |
-| GET | /api/assets/stats | Get dashboard statistics |
+| GET | /api/assets/stats | Retrieve dashboard statistics |
 
 ### Pagination and Filtering
 
-Example:
+Example request:
 
     GET /api/assets?page=0&size=5&type=LAPTOP&status=ASSIGNED
 
-Supported query parameters:
+Supported parameters:
 
 - page
 - size
@@ -141,20 +136,20 @@ Supported query parameters:
 
 The backend follows a layered architecture:
 
-    Controller -> Service -> Repository -> H2 Database
+    Controller → Service → Repository → H2 Database
 
 - Controller: Handles HTTP requests and responses.
 - Service: Handles business logic, validation, filtering, and pagination.
-- Repository: Provides database access using Spring Data JDBC.
+- Repository: Provides database access through Spring Data JDBC.
 - Model: Defines asset properties and enumerations.
 
 ## Testing
 
-### Backend Tests
+### Backend
 
-JUnit 5 and Mockito are used to test controllers and services.
+JUnit 5 and Mockito are used for controller and service tests.
 
-Run from the backend folder:
+From the backend directory:
 
     mvn test
 
@@ -163,9 +158,9 @@ Verified results:
 - 10 tests passed
 - 0 failures
 
-### Frontend Tests
+### Frontend
 
-Run from the repository root:
+From the repository root:
 
     npm test
 
@@ -174,36 +169,36 @@ Verified results:
 - 84 tests passed
 - 7 test files passed
 
-The frontend includes component, CRUD, filtering, pagination, and mocked HTTP communication tests.
+Frontend tests cover components, CRUD operations, pagination, filtering, and mocked HTTP requests.
 
-### Additional Checks
+Additional checks:
 
     npm run lint
     npm run build
 
-Both commands completed successfully during development.
+Both checks passed during development.
 
 ## Frontend-Backend Integration
 
-The frontend communicates with Spring Boot using the Fetch API.
+React communicates with Spring Boot using the Fetch API.
 
-The React service sends HTTP requests to the backend, processes JSON responses, and handles validation and request errors.
+The frontend sends HTTP requests to the backend, processes JSON responses, and displays validation errors.
 
-The original in-memory service is retained for isolated frontend tests.
+The original in-memory service is retained for isolated frontend testing.
 
 ## Database
 
 The application uses an in-memory H2 database.
 
-- 12 sample assets are loaded at startup.
-- Assets can be added, updated, searched, and deleted.
-- Restarting the backend resets the database.
+- 12 sample assets are loaded on startup.
+- Assets can be created, updated, retrieved, and deleted.
+- Restarting the backend resets the database to its initial state.
 
 ## Documentation
 
 - [Requirements](docs/REQUIREMENTS.md)
 - [Architecture](docs/ARCHITECTURE.md)
 
-## AI Use
+## Note on AI Use
 
 AI-assisted tools were used in the development of the Part 1 frontend. The team reviewed and tested the implementation. Part 2 involved developing the Spring Boot backend, integrating it with the frontend, and verifying the system through automated testing.
