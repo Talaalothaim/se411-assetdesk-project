@@ -1,145 +1,151 @@
-/**
- * assetService – the ONLY module that touches asset data.
- *
- * Part 1: data lives in an in-memory array. Every function is async and returns
- * copies, with the same shapes the Part 2 Spring REST API will return, so this
- * file can later be swapped for fetch() calls without changing any component.
- */
-import seedAssets from '../data/seedAssets.js'
-import { DEFAULT_PAGE_SIZE, TYPES } from '../data/constants.js'
+
+import { DEFAULT_PAGE_SIZE } from '../data/constants.js'
 import ApiError from './ApiError.js'
 import { normalizeAsset, validateAsset } from './validateAsset.js'
 
 export { ApiError, validateAsset }
 
-/** Artificial latency so loading states are visible. 0 under Vitest. */
-export const DELAY_MS = import.meta.env.MODE === 'test' ? 0 : 150
+const API_URL = 'http://localhost:8080/api/assets'
 
-const DUPLICATE_SERIAL = 'An asset with this serial number already exists.'
+export const DELAY_MS = 0
 
-let store = []
-let nextId = 1
+async function request(url, options = {}) {
+  let response
 
-function load() {
-  store = seedAssets.map((a) => ({ ...a }))
-  nextId = Math.max(0, ...store.map((a) => a.id)) + 1
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    })
+  } catch {
+    throw new ApiError(
+      503,
+      'Cannot connect to the Spring Boot server.'
+    )
+  }
+
+  if (!response.ok) {
+    let error
+
+    try {
+      error = await response.json()
+    } catch {
+      error = null
+    }
+
+    throw new ApiError(
+      response.status,
+      error?.message || 'Request failed.',
+      error?.fieldErrors || {}
+    )
+  }
+
+  if (response.status === 204) {
+    return null
+  }
+
+  const text = await response.text()
+
+  return text ? JSON.parse(text) : null
 }
-load()
-
-const copy = (a) => ({ ...a })
-const wait = () => (DELAY_MS > 0 ? new Promise((r) => setTimeout(r, DELAY_MS)) : Promise.resolve())
 
 function toId(id) {
-  const n = Number(id)
-  return Number.isInteger(n) && n > 0 ? n : null
+  const value = Number(id)
+
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new ApiError(404, `No asset with ID ${id}.`)
+  }
+
+  return value
 }
 
-function findIndex(id) {
-  const n = toId(id)
-  const index = n === null ? -1 : store.findIndex((a) => a.id === n)
-  if (index === -1) throw new ApiError(404, `No asset with ID ${id}.`)
-  return index
+export async function getAssets({
+  page = 0,
+  size = DEFAULT_PAGE_SIZE,
+  q,
+  type,
+  condition,
+  status,
+} = {}) {
+  const params = new URLSearchParams()
+
+  params.set('page', String(page))
+  params.set('size', String(size))
+
+  if (q) {
+    params.set('q', q)
+  }
+
+  if (type) {
+    params.set('type', type)
+  }
+
+  if (condition) {
+    params.set('condition', condition)
+  }
+
+  if (status) {
+    params.set('status', status)
+  }
+
+  return request(`${API_URL}?${params.toString()}`)
 }
 
-function toInt(value, fallback, min) {
-  const n = Number.parseInt(value, 10)
-  return Number.isNaN(n) || n < min ? fallback : n
+export async function getAssetById(id) {
+  return request(`${API_URL}/${toId(id)}`)
 }
 
-/** Normalizes + validates, then checks serial uniqueness (ignoring `selfId`). */
-function checkAsset(data, selfId = null) {
+export async function createAsset(data) {
   const asset = normalizeAsset(data)
   const fieldErrors = validateAsset(asset)
-  if (Object.keys(fieldErrors).length) {
-    throw new ApiError(400, 'Validation failed.', fieldErrors)
-  }
-  const serial = asset.serialNumber.toLowerCase()
-  if (store.some((a) => a.id !== selfId && a.serialNumber.toLowerCase() === serial)) {
-    throw new ApiError(409, DUPLICATE_SERIAL, { serialNumber: DUPLICATE_SERIAL })
-  }
-  return asset
-}
 
-/**
- * GET /api/assets?page=&size=&q=&type=&condition=&status=
- * Filters combine with AND. `q` searches deviceName, serialNumber and assignedTo.
- */
-export async function getAssets({ page = 0, size = DEFAULT_PAGE_SIZE, q, type, condition, status } = {}) {
-  await wait()
-  const p = toInt(page, 0, 0)
-  const s = toInt(size, DEFAULT_PAGE_SIZE, 1)
-  const needle = (q ?? '').trim().toLowerCase()
-
-  const filtered = store
-    .filter((a) =>
-      (!type || a.type === type) &&
-      (!condition || a.condition === condition) &&
-      (!status || a.status === status) &&
-      (!needle || [a.deviceName, a.serialNumber, a.assignedTo].some((v) => v.toLowerCase().includes(needle))),
+  if (Object.keys(fieldErrors).length > 0) {
+    throw new ApiError(
+      400,
+      'Validation failed.',
+      fieldErrors
     )
-    .sort((a, b) => a.id - b.id)
-
-  return {
-    content: filtered.slice(p * s, p * s + s).map(copy),
-    page: p,
-    size: s,
-    totalElements: filtered.length,
-    totalPages: Math.ceil(filtered.length / s),
   }
+
+  return request(API_URL, {
+    method: 'POST',
+    body: JSON.stringify(asset),
+  })
 }
 
-/** GET /api/assets/{id} */
-export async function getAssetById(id) {
-  await wait()
-  return copy(store[findIndex(id)])
-}
-
-/** POST /api/assets */
-export async function createAsset(data) {
-  await wait()
-  const asset = { id: nextId, ...checkAsset(data) }
-  nextId += 1
-  store.push(asset)
-  return copy(asset)
-}
-
-/** PUT /api/assets/{id} */
 export async function updateAsset(id, data) {
-  await wait()
-  const index = findIndex(id)
-  const existing = store[index]
-  const asset = { id: existing.id, ...checkAsset(data, existing.id) }
-  store[index] = asset
-  return copy(asset)
-}
+  const asset = normalizeAsset(data)
+  const fieldErrors = validateAsset(asset)
 
-/** DELETE /api/assets/{id} */
-export async function deleteAsset(id) {
-  await wait()
-  store.splice(findIndex(id), 1)
-}
-
-/** Dashboard numbers (computed client-side in Part 2, or GET /api/assets/stats). */
-export async function getStats() {
-  await wait()
-  const count = (fn) => store.filter(fn).length
-  const byType = Object.fromEntries(TYPES.map((t) => [t, count((a) => a.type === t)]))
-  const needsAttention = store
-    .filter((a) => a.status === 'IN_REPAIR' || a.condition === 'FAIR' || a.condition === 'DAMAGED')
-    .sort((a, b) => a.id - b.id)
-    .map(copy)
-
-  return {
-    total: store.length,
-    available: count((a) => a.status === 'AVAILABLE'),
-    assigned: count((a) => a.status === 'ASSIGNED'),
-    inRepair: count((a) => a.status === 'IN_REPAIR'),
-    byType,
-    needsAttention,
+  if (Object.keys(fieldErrors).length > 0) {
+    throw new ApiError(
+      400,
+      'Validation failed.',
+      fieldErrors
+    )
   }
+
+  return request(`${API_URL}/${toId(id)}`, {
+    method: 'PUT',
+    body: JSON.stringify(asset),
+  })
 }
 
-/** Restores the seed data. Used by tests only. */
+export async function deleteAsset(id) {
+  return request(`${API_URL}/${toId(id)}`, {
+    method: 'DELETE',
+  })
+}
+
+export async function getStats() {
+  return request(`${API_URL}/stats`)
+}
+
 export function resetStore() {
-  load()
+  throw new Error(
+    'resetStore is unavailable when using the Spring Boot backend.'
+  )
 }
