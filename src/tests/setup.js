@@ -23,3 +23,8 @@ if (typeof window !== 'undefined') {
 afterEach(() => {
   cleanup()
 })
+
+
+vi.mock('../services/assetService.js', async () => {
+  return import('../services/assetService.memory.js')
+})
